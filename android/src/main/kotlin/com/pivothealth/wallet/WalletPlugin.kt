@@ -7,7 +7,6 @@ import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
-import io.flutter.plugin.common.PluginRegistry.Registrar
 
 /** WalletPlugin */
 public class WalletPlugin: FlutterPlugin, MethodCallHandler {
@@ -33,8 +32,8 @@ public class WalletPlugin: FlutterPlugin, MethodCallHandler {
   // in the same class.
   companion object {
     @JvmStatic
-    fun registerWith(registrar: Registrar) {
-      val channel = MethodChannel(registrar.messenger(), "wallet")
+    fun registerWith(binding: FlutterPlugin.FlutterPluginBinding) {
+      val channel = MethodChannel(binding.binaryMessenger, "wallet")
       channel.setMethodCallHandler(WalletPlugin())
     }
   }
