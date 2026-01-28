@@ -57,7 +57,7 @@ public class SwiftWalletPlugin: NSObject, FlutterPlugin {
       }
 
       // Present the view controller
-      if let rootViewController = UIApplication.shared.keyWindow?.rootViewController {
+      if let rootViewController = SwiftWalletPlugin.topViewController() {
         rootViewController.present(addPassViewController, animated: true) {
           result(true)
         }
@@ -77,4 +77,34 @@ public class SwiftWalletPlugin: NSObject, FlutterPlugin {
       ))
     }
   }
+
+  // Helper to find the topmost view controller in a multi-scene safe way
+    private static func topViewController(base: UIViewController? = {
+      // Try to find the active window scene and its key window without using UIApplication.shared directly for app extensions
+      if #available(iOS 13.0, *) {
+        // Iterate connected scenes to find the foreground active one
+        let scenes = (UIApplication.perform(NSSelectorFromString("sharedApplication"))?.takeUnretainedValue() as? UIApplication)?.connectedScenes ?? []
+        let windowScene = scenes
+          .compactMap { $0 as? UIWindowScene }
+          .first { $0.activationState == .foregroundActive }
+        let window = windowScene?.windows.first { $0.isKeyWindow } ?? windowScene?.windows.first
+        return window?.rootViewController
+      } else {
+        // Fallback for iOS 12 and earlier
+        let app = UIApplication.perform(NSSelectorFromString("sharedApplication"))?.takeUnretainedValue() as? UIApplication
+        return app?.keyWindow?.rootViewController
+      }
+    }()) -> UIViewController? {
+      if let nav = base as? UINavigationController {
+        return topViewController(base: nav.visibleViewController)
+      }
+      if let tab = base as? UITabBarController, let selected = tab.selectedViewController {
+        return topViewController(base: selected)
+      }
+      if let presented = base?.presentedViewController {
+        return topViewController(base: presented)
+      }
+      return base
+    }
+
 }

@@ -24,5 +24,5 @@ Pod::Spec.new do |s|
     'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386' # Explicitly exclude i386 architecture
   }
 
-  s.swift_version = '5.0' # Ensure Swift 5.0 compatibility
+  s.swift_version = '6.0' # Ensure Swift 6.0 compatibility
 end
