@@ -19,10 +19,11 @@ public class SwiftWalletPlugin: NSObject, FlutterPlugin {
   }
 
   private func handleAddPassToWallet(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
-    // Ensure the arguments contain the required 'pkpass' data
+    // Dart sends List<int> which arrives as [Any] (array of NSNumber), not FlutterStandardTypedData.
+    // We must cast to [Any] and convert each element to UInt8 to build a Data object.
     guard let args = call.arguments as? [String: Any],
-          let data = args["pkpass"] as? FlutterStandardTypedData,
-          !data.data.isEmpty else {
+          let rawBytes = args["pkpass"] as? [Any],
+          !rawBytes.isEmpty else {
       result(FlutterError(
         code: "INVALID_ARGUMENTS",
         message: "The 'pkpass' parameter is missing or empty",
@@ -31,9 +32,21 @@ public class SwiftWalletPlugin: NSObject, FlutterPlugin {
       return
     }
 
+    let bytes = rawBytes.compactMap { ($0 as? NSNumber)?.uint8Value }
+    guard bytes.count == rawBytes.count else {
+      result(FlutterError(
+        code: "INVALID_ARGUMENTS",
+        message: "The 'pkpass' bytes could not be parsed",
+        details: nil
+      ))
+      return
+    }
+
+    let passData = Data(bytes)
+
     do {
       // Create a PKPass object from the provided data
-      let pass = try PKPass(data: data.data)
+      let pass = try PKPass(data: passData)
 
       // Check if the pass is already in the wallet
       let passLibrary = PKPassLibrary()

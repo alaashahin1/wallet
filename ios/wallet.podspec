@@ -15,7 +15,7 @@ Pod::Spec.new do |s|
   s.source           = { :path => '.' }
   s.source_files     = 'Classes/**/*'
   s.dependency 'Flutter'
-  s.platform         = :ios, '13.0' # Updated to iOS 11.0 as the minimum deployment target
+  s.platform         = :ios, '15.6' # Updated to iOS 11.0 as the minimum deployment target
 
   # Flutter.framework does not contain an i386 slice. Only x86_64 simulators are supported.
   s.pod_target_xcconfig = {
@@ -24,5 +24,5 @@ Pod::Spec.new do |s|
     'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386' # Explicitly exclude i386 architecture
   }
 
-  s.swift_version = '6.0' # Ensure Swift 6.0 compatibility
+  s.swift_version = '5.0' # Ensure Swift 6.0 compatibility
 end
